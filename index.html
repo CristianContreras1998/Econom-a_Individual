@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Finanzas">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Mis finanzas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+<style>
+/* =====================================================================
+   Liquid glass · superficies translúcidas con desenfoque sobre un fondo
+   con luz de color. Pensado primero para el iPhone.
+   ===================================================================== */
+:root{
+  --ink:#0d1424; --mut:#5b6880; --pri:#4f46e5; --pri2:#7c6cf6;
+  --ok:#059669; --warn:#c2760a; --bad:#dc2626;
+  --glass:rgba(255,255,255,.58);
+  --glass2:rgba(255,255,255,.74);
+  --brd:rgba(255,255,255,.75);
+  --brd2:rgba(13,20,36,.08);
+  --sh:0 1px 1px rgba(13,20,36,.04), 0 10px 30px -12px rgba(13,20,36,.22);
+  --pri-soft:rgba(79,70,229,.12);
+  --r:20px; --blur:blur(22px) saturate(175%); --luz:36%;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ink:#e9edfa; --mut:#95a1bb; --pri:#8b8cff; --pri2:#a78bfa;
+    --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --glass:rgba(22,29,48,.55);
+    --glass2:rgba(30,38,60,.72);
+    --brd:rgba(255,255,255,.10);
+    --brd2:rgba(255,255,255,.07);
+    --sh:0 1px 1px rgba(0,0,0,.2), 0 12px 34px -14px rgba(0,0,0,.6);
+    --pri-soft:rgba(139,140,255,.16); --luz:58%;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;color:var(--ink);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",
+       system-ui,Roboto,sans-serif;
+  background:
+    radial-gradient(38rem 30rem at 12% -8%, rgba(99,102,241,.30), transparent 60%),
+    radial-gradient(32rem 26rem at 92% 4%, rgba(236,72,153,.22), transparent 62%),
+    radial-gradient(34rem 28rem at 68% 96%, rgba(20,184,166,.20), transparent 60%),
+    linear-gradient(180deg,#f2f5fc,#e9edf8);
+  background-attachment:fixed;
+}
+@media (prefers-color-scheme:dark){
+  body{background:
+    radial-gradient(38rem 30rem at 10% -10%, rgba(79,70,229,.34), transparent 60%),
+    radial-gradient(32rem 26rem at 94% 2%, rgba(219,39,119,.22), transparent 62%),
+    radial-gradient(34rem 28rem at 70% 98%, rgba(13,148,136,.22), transparent 60%),
+    linear-gradient(180deg,#0a0f1e,#070b16);}
+}
+h1,h2,h3{margin:0;font-weight:660;letter-spacing:-.02em}
+h1{font-size:1.5rem}h2{font-size:1.02rem}h3{font-size:.9rem}
+a{color:var(--pri);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ------------------------------------------------------------- cristal */
+.glass, .card, .kpi{
+  background:var(--glass);
+  -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+  border:1px solid var(--brd);
+  box-shadow:var(--sh), inset 0 1px 0 rgba(255,255,255,.45);
+  border-radius:var(--r);
+}
+@media (prefers-color-scheme:dark){
+  .glass,.card,.kpi{box-shadow:var(--sh), inset 0 1px 0 rgba(255,255,255,.06)}
+}
+.card{padding:1rem;min-width:0}
+
+/* ------------------------------------------------------------- botones */
+button{
+  font:inherit;font-weight:600;cursor:pointer;border:0;border-radius:13px;
+  padding:.55rem .9rem;color:#fff;letter-spacing:-.01em;
+  background:linear-gradient(180deg,var(--pri2),var(--pri));
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset,
+             0 6px 16px -8px rgba(79,70,229,.8);
+  transition:transform .12s ease, filter .12s ease;
+}
+button:active{transform:scale(.97)}
+button:hover{filter:brightness(1.06)}
+button:disabled{opacity:.45;cursor:default;box-shadow:none}
+button.gh{
+  background:var(--glass2);color:var(--ink);border:1px solid var(--brd);
+  -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+}
+button.dan{background:transparent;color:var(--bad);
+  border:1px solid var(--brd2);box-shadow:none}
+button.sm{padding:.34rem .6rem;font-size:.82rem;border-radius:10px}
+
+/* -------------------------------------------------------------- campos */
+input,select,textarea{
+  font:inherit;color:var(--ink);width:100%;
+  background:var(--glass2);
+  border:1px solid var(--brd2);border-radius:12px;padding:.5rem .65rem;
+  -webkit-appearance:none;appearance:none;
+}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),
+        linear-gradient(135deg,var(--mut) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 51%, calc(100% - 10px) 51%;
+  background-size:5px 5px, 5px 5px;background-repeat:no-repeat;
+  padding-right:1.9rem}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
+input[type=checkbox]{width:auto;accent-color:var(--pri);
+  -webkit-appearance:checkbox;appearance:checkbox}
+label{display:block;font-size:.74rem;color:var(--mut);margin-bottom:.25rem;
+  font-weight:600;letter-spacing:.01em}
+/* Safari en iOS hace zoom al enfocar un campo de menos de 16px */
+@media (max-width:820px){
+  input,select,button,textarea,td input,td select{font-size:16px}
+  button.sm{font-size:14px}
+}
+
+/* ------------------------------------------------------------ maquetas */
+.wrap{max-width:1120px;margin:0 auto;padding:0 .9rem 4rem}
+.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.grid{display:grid;gap:.8rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.tres{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}
+@media (max-width:820px){.two{grid-template-columns:1fr;gap:.7rem}}
+.mut{color:var(--mut)}.sm{font-size:.84rem}.xs{font-size:.75rem}
+.right{text-align:right}.b{font-weight:660}
+.num,.kpi .v,td,th{font-variant-numeric:tabular-nums}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.hide{display:none!important}
+
+/* ------------------------------------------------------------ cabecera */
+header{position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.5));
+  -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--brd);}
+@media (prefers-color-scheme:dark){
+  header{background:linear-gradient(180deg,rgba(12,17,31,.78),rgba(12,17,31,.55))}
+}
+.hd{max-width:1120px;margin:0 auto;padding:.55rem .9rem;display:flex;gap:.7rem;
+  align-items:center;flex-wrap:wrap;position:relative}
+.logo{font-weight:750;letter-spacing:-.03em;display:flex;gap:.45rem;
+  align-items:center;font-size:1.02rem}
+.msel{display:flex;gap:.3rem;align-items:center;margin-left:auto}
+.msel select{width:auto;padding:.4rem 1.7rem .4rem .6rem;font-weight:600}
+@supports (padding-top: env(safe-area-inset-top)){
+  header{padding-top:env(safe-area-inset-top)}
+  .wrap{padding-left:max(.9rem, env(safe-area-inset-left));
+        padding-right:max(.9rem, env(safe-area-inset-right))}
+}
+
+/* --------------------------------------------- menú superior segmentado */
+nav#tabs{max-width:1120px;margin:0 auto;padding:.1rem .9rem .55rem;
+  display:flex;gap:.3rem;overflow-x:auto;scrollbar-width:none}
+nav#tabs::-webkit-scrollbar{display:none}
+nav#tabs button{
+  background:transparent;color:var(--mut);border-radius:12px;
+  padding:.42rem .72rem;font-size:.86rem;font-weight:600;white-space:nowrap;
+  display:flex;align-items:center;gap:.4rem;box-shadow:none;
+}
+nav#tabs button svg{width:17px;height:17px;stroke:currentColor;fill:none;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+nav#tabs button:hover{color:var(--ink);background:var(--pri-soft)}
+nav#tabs button.on{
+  color:var(--pri);background:var(--glass2);
+  border:1px solid var(--brd);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 4px 12px -8px rgba(13,20,36,.5);
+}
+nav#tabs button.on svg{opacity:1}
+
+/* ---------------------------------------------------------------- kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));
+  gap:.7rem}
+.kpi{padding:.8rem .9rem}
+.kpi .t{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--mut);font-weight:700}
+.kpi .v{font-size:1.4rem;font-weight:730;margin-top:.1rem;letter-spacing:-.03em}
+
+/* -------------------------------------------------------------- tablas */
+table{width:100%;border-collapse:collapse}
+th{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);
+  text-align:left;font-weight:700;padding:.45rem .5rem;
+  border-bottom:1px solid var(--brd2)}
+td{padding:.4rem .5rem;border-bottom:1px solid var(--brd2)}
+tbody tr:last-child td{border-bottom:0}
+.tw{overflow-x:auto;margin:0 -.25rem;padding:0 .25rem}
+td input,td select{padding:.32rem .5rem;border-radius:10px}
+
+/* --------------------------------------------------------------- otros */
+.bar{height:8px;border-radius:99px;background:rgba(13,20,36,.09);overflow:hidden;
+  margin-top:.35rem}
+@media (prefers-color-scheme:dark){.bar{background:rgba(255,255,255,.10)}}
+.bar>i{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--pri2),var(--pri))}
+.bar>i.warn{background:linear-gradient(90deg,#fbbf24,#d97706)}
+.bar>i.bad{background:linear-gradient(90deg,#fb7185,#dc2626)}
+.chip{display:inline-block;padding:.12rem .5rem;border-radius:99px;font-size:.72rem;
+  font-weight:700;background:var(--pri-soft);color:var(--pri);
+  border:1px solid var(--brd2)}
+.chip.bad{background:rgba(220,38,38,.13);color:var(--bad)}
+.chip.ok{background:rgba(5,150,105,.14);color:var(--ok)}
+.chip.warn{background:rgba(217,119,6,.15);color:var(--warn)}
+.avisos{display:grid;gap:.4rem}
+.aviso{display:flex;gap:.55rem;align-items:flex-start;padding:.55rem .7rem;
+  border-radius:14px;background:rgba(220,38,38,.10);color:var(--bad);
+  border:1px solid rgba(220,38,38,.18);font-size:.86rem}
+.aviso.w{background:rgba(217,119,6,.12);color:var(--warn);
+  border-color:rgba(217,119,6,.2)}
+.aviso.i{background:var(--pri-soft);color:var(--pri);border-color:transparent}
+.aviso b{color:inherit}
+details>summary{cursor:pointer;font-weight:600;font-size:.84rem;color:var(--mut);
+  padding:.2rem 0}
+.chartbox{position:relative;width:100%;height:240px;min-width:0}
+.chartbox>canvas{position:absolute;top:0;left:0;width:100%!important;
+  height:100%!important;display:block}
+
+/* --------------------------------------------------------------- login */
+.center{min-height:100dvh;display:grid;place-items:center;padding:1.2rem}
+.box{width:100%;max-width:420px}
+
+.toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);z-index:99;
+  background:rgba(13,20,36,.86);color:#fff;padding:.6rem 1rem;border-radius:99px;
+  font-size:.86rem;font-weight:600;opacity:0;transition:.2s;pointer-events:none;
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.6)}
+.toast.on{opacity:1}
+
+/* =====================================================================
+   MÓVIL: barra inferior de cristal, fichas en vez de tablas y botón +
+   ===================================================================== */
+#navAbajo, #fab, #hoja{display:none}
+
+@media (max-width:820px){
+  nav#tabs{display:none}
+  .hd{padding:.5rem .8rem .55rem;gap:.5rem}
+  .msel{width:100%;margin-left:0;display:grid;
+    grid-template-columns:auto 1fr 1fr auto;gap:.35rem}
+  .msel select{width:100%;padding:.5rem 1.7rem .5rem .6rem}
+  .msel button{padding:.5rem .7rem}
+  #btnSalir{position:absolute;right:.8rem;top:.35rem;font-size:13px;
+    padding:.25rem .55rem;border-radius:9px}
+  .wrap{padding-bottom:calc(7rem + env(safe-area-inset-bottom,0px))}
+
+  #navAbajo{display:flex;position:fixed;left:.55rem;right:.55rem;
+    bottom:calc(.5rem + env(safe-area-inset-bottom,0px));z-index:30;
+    gap:.15rem;padding:.3rem;border-radius:22px;
+    background:var(--glass);
+    -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+    border:1px solid var(--brd);
+    box-shadow:0 14px 34px -12px rgba(13,20,36,.45),
+               inset 0 1px 0 rgba(255,255,255,.5)}
+  #navAbajo button{flex:1;background:transparent;color:var(--mut);
+    border-radius:17px;display:flex;flex-direction:column;align-items:center;
+    gap:.12rem;padding:.42rem .1rem;font-size:10.5px;font-weight:700;
+    box-shadow:none;letter-spacing:-.01em}
+  #navAbajo button svg{width:22px;height:22px;stroke:currentColor;fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #navAbajo button.on{color:#fff;
+    background:linear-gradient(180deg,var(--pri2),var(--pri));
+    box-shadow:0 6px 14px -8px rgba(79,70,229,.9)}
+
+  #fab{display:flex;position:fixed;right:1rem;
+    bottom:calc(5.6rem + env(safe-area-inset-bottom,0px));z-index:31;
+    width:54px;height:54px;border-radius:50%;align-items:center;
+    justify-content:center;font-size:1.9rem;line-height:0;padding:0;
+    box-shadow:0 10px 26px -8px rgba(79,70,229,.75),
+               inset 0 1px 0 rgba(255,255,255,.5)}
+
+  #hoja.on{display:block;position:fixed;inset:0;z-index:40;
+    background:rgba(13,20,36,.4);
+    -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px)}
+  #hoja .panel{position:absolute;left:.55rem;right:.55rem;
+    bottom:calc(.5rem + env(safe-area-inset-bottom,0px));
+    background:var(--glass2);
+    -webkit-backdrop-filter:var(--blur); backdrop-filter:var(--blur);
+    border:1px solid var(--brd);border-radius:24px;padding:.9rem;
+    display:grid;gap:.35rem;
+    box-shadow:0 20px 50px -14px rgba(13,20,36,.5)}
+  #hoja .panel button{background:transparent;color:var(--ink);text-align:left;
+    padding:.7rem .8rem;border-radius:14px;border:1px solid var(--brd2);
+    display:flex;align-items:center;gap:.6rem;font-size:15px;box-shadow:none}
+  #hoja .panel button svg{width:20px;height:20px;stroke:currentColor;fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  #hoja .panel button.on{background:var(--pri-soft);color:var(--pri);
+    border-color:transparent}
+  #hoja .titulo{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--mut);font-weight:700;padding:.1rem .3rem .3rem}
+
+  /* cada fila de tabla pasa a ser una ficha */
+  table.tarjetas,table.tarjetas tbody{display:block}
+  table.tarjetas thead{display:none}
+  table.tarjetas tr{display:block;border:1px solid var(--brd2);
+    border-radius:16px;padding:.55rem .75rem;margin-bottom:.5rem;
+    background:var(--glass2)}
+  table.tarjetas td{display:flex;align-items:center;justify-content:space-between;
+    gap:.7rem;border:0;padding:.22rem 0;text-align:left}
+  table.tarjetas td::before{content:attr(data-label);color:var(--mut);
+    font-size:.7rem;font-weight:700;text-transform:uppercase;
+    letter-spacing:.04em;flex:0 0 auto}
+  table.tarjetas td:not([data-label])::before{content:none}
+  table.tarjetas td>input,table.tarjetas td>select{max-width:60%}
+  table.tarjetas td>button{margin-left:auto}
+  table.tarjetas .bar{width:100%}
+  table.tarjetas td:empty{display:none}
+  .tw{overflow-x:visible;margin:0;padding:0}
+
+  .card{padding:.85rem;border-radius:18px}
+  .toast{bottom:calc(6.2rem + env(safe-area-inset-bottom,0px))}
+  h1{font-size:1.35rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ CONFIGURACIÓN ============================ -->
+<div id="vCfg" class="center hide">
+  <div class="box card grid">
+    <h1>Mis finanzas</h1>
+    <p class="mut sm">Pega los datos de tu proyecto de Supabase. Se guardan solo en
+      este dispositivo.</p>
+    <div><label>URL del proyecto</label>
+      <input id="cfgUrl" placeholder="https://xxxxx.supabase.co">
+      <p class="xs mut" style="margin:.3rem 0 0">Solo el dominio. Si copias la URL de
+        la API, se recorta el <code>/rest/v1/</code> automáticamente.</p></div>
+    <div><label>Clave pública (anon o publishable)</label>
+      <input id="cfgKey" placeholder="sb_publishable_… o eyJhbGciOi…"></div>
+    <button id="cfgSave">Guardar y continuar</button>
+    <p id="cfgErr" class="sm bad"></p>
+  </div>
+</div>
+
+<!-- ================================ LOGIN ================================ -->
+<div id="vLogin" class="center hide">
+  <div class="box card grid">
+    <h1>💰 Mis finanzas</h1>
+    <div><label>Correo</label><input id="logEmail" type="email" autocomplete="username"></div>
+    <div><label>Contraseña</label>
+      <input id="logPass" type="password" autocomplete="current-password"></div>
+    <button id="logIn">Entrar</button>
+    <div class="row sm">
+      <a href="#" id="logLink">Enviar enlace por correo</a>
+      <a href="#" id="logReset" style="margin-left:auto">Cambiar de proyecto</a>
+    </div>
+    <p id="logMsg" class="sm mut"></p>
+    <p id="logProy" class="xs mut"></p>
+  </div>
+</div>
+
+<!-- ================================= APP ================================= -->
+<div id="vApp" class="hide">
+<header>
+  <div class="hd">
+    <div class="logo">💰 <span id="tituloApp">Mis finanzas</span></div>
+    <div class="msel">
+      <button class="gh sm" id="mPrev" title="Mes anterior">‹</button>
+      <select id="mMes"></select>
+      <select id="mAnio"></select>
+      <button class="gh sm" id="mNext" title="Mes siguiente">›</button>
+    </div>
+    <button class="gh sm" id="btnSalir" title="Cerrar sesión">Salir</button>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+
+<div class="wrap">
+  <div id="mesVacio" class="card grid hide" style="margin-top:1rem">
+    <h2>Este mes está sin empezar</h2>
+    <p class="mut sm">Crea <b id="mvNom"></b>. Al copiar el mes anterior se traen
+      el gasto conjunto entero y las partidas individuales marcadas como fijas,
+      con lo abonado a cero.</p>
+    <div class="row">
+      <button id="mvCrear">Crear mes copiando el anterior</button>
+      <button class="gh" id="mvVacio">Crear mes vacío</button>
+    </div>
+  </div>
+
+  <section id="tConjunto" class="grid hide" style="margin-top:1rem"></section>
+  <section id="tIndividual" class="grid hide" style="margin-top:1rem"></section>
+  <section id="tAnalisis" class="grid hide" style="margin-top:1rem"></section>
+</div>
+</div>
+
+<nav id="navAbajo"></nav>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+"use strict";
+
+/* =====================================================================
+   utilidades
+   ===================================================================== */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const EUR = new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'});
+const eur = v => EUR.format(Number(v||0));
+const n2  = v => Math.round((Number(v)||0)*100)/100;
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
+               'septiembre','octubre','noviembre','diciembre'];
+const MES3 = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>(
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum = (a,f=x=>x) => a.reduce((t,x)=>t+(Number(f(x))||0),0);
+const pct = (a,b) => b>0 ? Math.min(100, (a/b)*100) : (a>0?100:0);
+const nombreMes = (a,m) => `${MESES[m-1]} de ${a}`;
+
+let toastT;
+function toast(msg, err){
+  const t=$('#toast'); t.textContent=msg;
+  t.style.background = err ? 'var(--bad)' : 'rgba(13,20,36,.86)';
+  t.classList.add('on'); clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('on'), err?4200:1800);
+}
+function fail(e){
+  console.error(e);
+  toast(e?.message ? 'Error: '+e.message : 'Se ha producido un error', true);
+}
+/** Color del consumo: ámbar cuando falta mucho, verde al llegar al 100 %,
+ *  rojo si se pasa o si hay gasto sin nada presupuestado. */
+function colorPct(g, p){
+  if(p <= 0) return 'var(--bad)';
+  const r = g / p;
+  if(r > 1.0001) return 'var(--bad)';
+  const h = 44 + (145 - 44) * Math.max(0, Math.min(1, r));
+  return `hsl(${h.toFixed(0)} 74% var(--luz))`;
+}
+function celdaPct(g, p){
+  if(p <= 0){
+    return g > 0
+      ? `<b style="color:var(--bad)" title="Sin nada presupuestado">sin presup.</b>`
+      : '<span class="mut">—</span>';
+  }
+  const r = g / p * 100;
+  return `<b style="color:${colorPct(g,p)}">${r.toFixed(r >= 100 ? 0 : 1)}%</b>`;
+}
+const barra = (g,p) => `<div class="bar"><i style="width:${pct(g,p)}%;
+  background:${colorPct(g,p)}"></i></div>`;
+
+/* =====================================================================
+   estado
+   ===================================================================== */
+const S = {
+  sb:null, user:null,
+  categorias:[], meses:[], conjuntos:[], partidas:[],
+  anio:null, mes:null, tab:'conjunto', charts:{}
+};
+/* =====================================================================
+   TU PROYECTO DE SUPABASE.
+   La clave "publishable" está pensada para ir en el navegador: no es un
+   secreto, porque sin tu sesión el RLS no deja leer ni una fila.
+   ===================================================================== */
+const PROYECTO = {
+  url: 'https://vcgaggtopgoxasuempkx.supabase.co',
+  key: 'sb_publishable_JwHFfeGG8xIShn8pc5Gctg_CL7_BTC5',
+};
+
+/** Deja solo el dominio del proyecto: admite que pegues la URL de la API
+ *  (…/rest/v1/), con barras de más o sin https://. */
+function normalizarUrl(u){
+  u=String(u||'').trim().replace(/\s/g,'');
+  if(!u) return '';
+  if(!/^https?:\/\//i.test(u)) u='https://'+u.replace(/^\/+/,'');
+  try{ return new URL(u).origin; }catch(e){ return ''; }
+}
+const CFG = {
+  get url(){ return normalizarUrl(window.__FIN_CFG?.url
+    || localStorage.getItem('fin.url') || PROYECTO.url || ''); },
+  get key(){ return String(window.__FIN_CFG?.key
+    || localStorage.getItem('fin.key') || PROYECTO.key || '').trim(); },
+  set(u,k){ localStorage.setItem('fin.url',normalizarUrl(u));
+            localStorage.setItem('fin.key',String(k||'').trim()); },
+  clear(){ localStorage.removeItem('fin.url'); localStorage.removeItem('fin.key'); }
+};
+const mesActual = () => S.meses.find(x=>x.anio===S.anio && x.mes===S.mes) || null;
+const mesPrevio = () => {
+  let m=S.mes-1, y=S.anio; if(m<1){m=12;y--;}
+  return S.meses.find(x=>x.anio===y && x.mes===m) || null;
+};
+const catById = id => S.categorias.find(c=>c.id===id);
+const catNom  = id => catById(id)?.nombre || 'Sin categoría';
+const delMes = (arr, mid) => arr.filter(x=>x.mes_id===mid);
+const optsCats = sel => S.categorias.map(c=>
+  `<option value="${c.id}"${c.id===sel?' selected':''}>${esc(c.nombre)}</option>`).join('');
+
+/* =====================================================================
+   arranque
+   ===================================================================== */
+window.addEventListener('DOMContentLoaded', init);
+
+async function init(){
+  if(!CFG.url || !CFG.key){ return mostrar('#vCfg'); }
+  try{
+    const dominio = CFG.url.replace(/^https?:\/\//,'').split('.')[0];
+    S.sb = window.supabase.createClient(CFG.url, CFG.key, {
+      auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true,
+             storageKey:'fin.sesion.'+dominio }
+    });
+  }catch(e){ return mostrar('#vCfg'); }
+  const {data:{session}} = await S.sb.auth.getSession();
+  if(!session) return mostrar('#vLogin');
+  S.user = session.user;
+  await arrancarApp();
+}
+function mostrar(sel){
+  ['#vCfg','#vLogin','#vApp'].forEach(s=>$(s).classList.toggle('hide', s!==sel));
+  if(sel==='#vLogin') $('#logProy').textContent='Proyecto: '+CFG.url;
+}
+
+/* --- configuración --- */
+$('#cfgUrl').value = CFG.url || PROYECTO.url || '';
+$('#cfgKey').value = localStorage.getItem('fin.key') || '';
+$('#cfgSave').onclick = () => {
+  const u=normalizarUrl($('#cfgUrl').value), k=$('#cfgKey').value.trim();
+  if(!u || !/\..+/.test(u)) return $('#cfgErr').textContent=
+    'La URL no es válida. Debe ser como https://abcdefgh.supabase.co';
+  if(k.length<20) return $('#cfgErr').textContent=
+    'La clave parece incompleta: cópiala entera desde Project Settings → API.';
+  $('#cfgErr').innerHTML='Guardando… se usará <b>'+esc(u)+'</b>';
+  CFG.set(u,k); setTimeout(()=>location.reload(), 150);
+};
+
+/* --- login --- */
+$('#logIn').onclick = async () => {
+  const email=$('#logEmail').value.trim(), password=$('#logPass').value;
+  $('#logMsg').textContent='Entrando…';
+  const {data,error} = await S.sb.auth.signInWithPassword({email,password});
+  if(error){
+    let extra='';
+    if(/invalid path|not found|404/i.test(error.message))
+      extra='<br>La URL del proyecto no parece correcta. Debe ser solo el dominio'
+           +' (<code>https://xxxxx.supabase.co</code>), sin <code>/rest/v1</code>.';
+    else if(/api key|apikey|jwt/i.test(error.message))
+      extra='<br>Revisa la clave pública: cópiala entera desde'
+           +' Project Settings → API.';
+    return $('#logMsg').innerHTML='<span class="bad">'+esc(error.message)+extra+'</span>';
+  }
+  S.user=data.user; $('#logMsg').textContent='';
+  await arrancarApp();
+};
+$('#logPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#logIn').click(); });
+$('#logLink').onclick = async e => {
+  e.preventDefault();
+  const email=$('#logEmail').value.trim();
+  if(!email) return $('#logMsg').textContent='Escribe primero tu correo.';
+  const {error} = await S.sb.auth.signInWithOtp({email,
+    options:{emailRedirectTo:location.href}});
+  $('#logMsg').textContent = error ? error.message
+    : 'Te hemos enviado un enlace de acceso a '+email;
+};
+$('#logReset').onclick = e => { e.preventDefault(); CFG.clear(); location.reload(); };
+$('#btnSalir').onclick = async () => { await S.sb.auth.signOut(); location.reload(); };
+
+async function arrancarApp(){
+  mostrar('#vApp');
+  try{ await cargarTodo(); }catch(e){ return fail(e); }
+  if(S.error){
+    $('.wrap').innerHTML = '<div class="card grid" style="margin-top:1rem">'+
+      '<h2>Faltan las tablas en Supabase</h2><p class="mut sm">'+
+      'Ejecuta <code>01-esquema.sql</code> y luego <code>02-datos.sql</code> en el '+
+      'SQL Editor de tu proyecto.</p><p class="xs bad">'+esc(S.error)+'</p></div>';
+    return;
+  }
+  const hoy = new Date();
+  S.anio = hoy.getFullYear(); S.mes = hoy.getMonth()+1;
+  if(!mesActual() && S.meses.length){
+    const ult = S.meses[S.meses.length-1];
+    S.anio = ult.anio; S.mes = ult.mes;
+  }
+  pintarSelectores(); pintarTabs(); render();
+}
+
+/* =====================================================================
+   carga de datos (todo en memoria: son unos cientos de filas)
+   ===================================================================== */
+async function cargarTodo(){
+  const sb=S.sb;
+  const [cat,mes] = await Promise.all([
+    sb.from('categorias').select('*').order('orden'),
+    sb.from('meses').select('*').order('anio').order('mes'),
+  ]);
+  for(const r of [cat,mes]) if(r.error){ S.error=r.error.message; return; }
+  S.error=null;
+  S.categorias=cat.data; S.meses=mes.data;
+  const [con,par] = await Promise.all([
+    sb.from('conjuntos').select('*').order('orden').order('id'),
+    sb.from('partidas').select('*').order('orden').order('id'),
+  ]);
+  for(const r of [con,par]) if(r.error){ S.error=r.error.message; return; }
+  S.conjuntos=con.data; S.partidas=par.data;
+}
+async function recargar(){ await cargarTodo(); render(); }
+
+/* --- escritura --- */
+const TABLAS = {categorias:'categorias', meses:'meses', conjuntos:'conjuntos',
+                partidas:'partidas'};
+async function guardar(tabla, obj){
+  const {error} = await S.sb.from(tabla).update(obj).eq('id', obj.id);
+  if(error) return fail(error);
+  const fila = S[TABLAS[tabla]]?.find(x=>x.id===obj.id);
+  if(fila) Object.assign(fila, obj); else await cargarTodo();
+  toast('Guardado'); render();
+}
+async function insertar(tabla, obj, silencio){
+  const {data,error} = await S.sb.from(tabla).insert(obj).select().single();
+  if(error){ fail(error); return null; }
+  await cargarTodo();
+  if(!silencio) toast('Añadido');
+  render();
+  return data;
+}
+async function borrar(tabla, id){
+  const {error} = await S.sb.from(tabla).delete().eq('id', id);
+  if(error) return fail(error);
+  await cargarTodo(); toast('Borrado'); render();
+}
+
+/* =====================================================================
+   selectores de mes y pestañas
+   ===================================================================== */
+function pintarSelectores(){
+  const anios=new Set(S.meses.map(m=>m.anio));
+  const y0=new Date().getFullYear();
+  [y0-2,y0-1,y0,y0+1].forEach(y=>anios.add(y));
+  $('#mAnio').innerHTML=[...anios].sort().map(y=>`<option value="${y}">${y}</option>`).join('');
+  $('#mMes').innerHTML=MESES.map((m,i)=>
+    `<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join('');
+  $('#mAnio').value=S.anio; $('#mMes').value=S.mes;
+  $('#mAnio').onchange=()=>{ S.anio=+$('#mAnio').value; render(); };
+  $('#mMes').onchange =()=>{ S.mes =+$('#mMes').value;  render(); };
+  $('#mPrev').onclick =()=>saltarMes(-1);
+  $('#mNext').onclick =()=>saltarMes(1);
+}
+function saltarMes(d){
+  let m=S.mes+d, y=S.anio;
+  if(m<1){m=12;y--;} if(m>12){m=1;y++;}
+  S.mes=m; S.anio=y; $('#mAnio').value=y; $('#mMes').value=m; render();
+}
+const SVG = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const ICO = {
+  conjunto:   SVG('<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/>'
+                + '<circle cx="17" cy="10" r="2.5"/><path d="M12.5 20c0-2.5 2-4.5 4.5-4.5'
+                + 's4.5 2 4.5 4.5"/>'),
+  individual: SVG('<path d="M4 6h16M4 12h16M4 18h11"/>'),
+  analisis:   SVG('<path d="M4 20V11M10 20V4M16 20v-6M22 20H2"/>'),
+};
+const TABS=[['conjunto','Conjunto'],['individual','Individual'],
+            ['analisis','Análisis']];
+/* El análisis mira todos los meses, así que no necesita que el mes exista */
+const SIN_MES = ['analisis'];
+
+function pintarTabs(){
+  $('#tabs').innerHTML=TABS.map(([k,t])=>
+    `<button data-tab="${k}">${ICO[k]}<span>${t}</span></button>`).join('');
+  $('#navAbajo').innerHTML = TABS.map(([k,t])=>
+    `<button data-tab="${k}">${ICO[k]}<span>${t}</span></button>`).join('');
+  $$('[data-tab]').forEach(b=>b.onclick=()=>{
+    S.tab=b.dataset.tab; render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+}
+
+/* =====================================================================
+   cálculos
+   ===================================================================== */
+/** Página 1 · el reparto del mes.
+ *  mi aportación = total presupuestado entre los dos × mi porcentaje
+ *  me llevo      = cobrado − reservado − mi aportación
+ *  El reservado es lo que ya está en la Pluxee (transporte y similares): no
+ *  llega a la cuenta, así que tampoco se lo lleva. */
+function calculoConjunto(m){
+  const filas = delMes(S.conjuntos, m.id)
+    .map(f=>({...f, importe:n2(f.importe)}))
+    .sort((a,b)=>(a.orden??999)-(b.orden??999) || a.id-b.id);
+  const porc  = Number(m.porcentaje)||0;
+  const total = n2(sum(filas, f=>f.importe));
+  const mia   = n2(total * porc);
+  const suya  = n2(total - mia);
+  const cobrado = n2(m.cobrado);
+  const reservado = n2(m.reservado);
+  return {filas, porc, total, mia, suya, cobrado, reservado,
+          detalle: filas.map(f=>({...f, mia:n2(f.importe * porc)})),
+          meLlevo: n2(cobrado - reservado - mia)};
+}
+/** Página 2 · mi presupuesto individual. */
+function calculoIndividual(m){
+  const filas = delMes(S.partidas, m.id)
+    .map(p=>({...p, importe:n2(p.importe), abonado:n2(p.abonado),
+              pendiente:n2(+p.importe - +p.abonado)}));
+  const presupuesto = n2(sum(filas, p=>p.importe));
+  const abonado     = n2(sum(filas, p=>p.abonado));
+  const cats = new Map();
+  filas.forEach(p=>{
+    const k = p.categoria_id ?? 0;
+    if(!cats.has(k)) cats.set(k,{cat:catById(p.categoria_id), nombre:catNom(p.categoria_id),
+                                 presupuesto:0, abonado:0, n:0});
+    const c=cats.get(k);
+    c.presupuesto=n2(c.presupuesto+p.importe);
+    c.abonado=n2(c.abonado+p.abonado); c.n++;
+  });
+  return {filas, presupuesto, abonado, pendiente:n2(presupuesto-abonado),
+          ahorro:n2(sum(filas.filter(p=>catById(p.categoria_id)?.tipo==='ahorro'),
+                        p=>p.importe)),
+          porCat:[...cats.values()].map(c=>({...c,
+            pendiente:n2(c.presupuesto-c.abonado)}))
+            .sort((a,b)=>(a.cat?.orden??999)-(b.cat?.orden??999))};
+}
+/** Las dos páginas juntas, para el análisis. */
+function resumenMes(m){
+  const cj = calculoConjunto(m);
+  const iv = calculoIndividual(m);
+  return {m, anio:m.anio, mes:m.mes, conjunto:cj, individual:iv,
+          cobrado:cj.cobrado, reservado:cj.reservado, porc:cj.porc,
+          total:n2(cj.mia + iv.presupuesto),
+          sobra:n2(cj.meLlevo - iv.presupuesto)};
+}
+
+/* =====================================================================
+   render
+   ===================================================================== */
+function render(){
+  $$('[data-tab]').forEach(b=>b.classList.toggle('on', b.dataset.tab===S.tab));
+  const mesRow = mesActual();
+  $('#mvNom').textContent = nombreMes(S.anio, S.mes);
+  $('#mesVacio').classList.toggle('hide', !!mesRow || SIN_MES.includes(S.tab));
+  $('#mvCrear').onclick = ()=>crearMes(true);
+  $('#mvVacio').onclick = ()=>crearMes(false);
+  $('#mvCrear').disabled = !mesPrevio();
+  const secs={conjunto:'#tConjunto', individual:'#tIndividual',
+              analisis:'#tAnalisis'};
+  Object.entries(secs).forEach(([k,sel])=>{
+    const on = k===S.tab && (mesRow || SIN_MES.includes(k));
+    $(sel).classList.toggle('hide', !on);
+    if(!on) $(sel).innerHTML='';
+  });
+  if(!mesRow && !SIN_MES.includes(S.tab)) return;
+  ({conjunto:vConjunto, individual:vIndividual, analisis:vAnalisis}[S.tab])(mesRow);
+}
+
+async function crearMes(copiando){
+  const prev = mesPrevio();
+  try{
+    if(copiando && prev){
+      const {error} = await S.sb.rpc('copiar_mes', {
+        p_anio:S.anio, p_mes:S.mes, p_desde_anio:prev.anio, p_desde_mes:prev.mes});
+      if(error) throw error;
+    }else{
+      const {error} = await S.sb.from('meses').insert({
+        anio:S.anio, mes:S.mes,
+        porcentaje: prev ? prev.porcentaje : 0.5,
+        cobrado:   prev ? prev.cobrado   : 0,
+        reservado: prev ? prev.reservado : 0});
+      if(error) throw error;
+    }
+  }catch(e){ return fail(e); }
+  await cargarTodo(); toast('Mes creado'); render();
+}
+
+/* ================================================== 1 · GASTO CONJUNTO === */
+function vConjunto(m){
+  const c = calculoConjunto(m);
+
+  $('#tConjunto').innerHTML = `
+  <div class="card grid">
+    <div class="row"><h2>Reparto de ${nombreMes(S.anio,S.mes)}</h2></div>
+    <div class="tres">
+      <div><label>Lo que he cobrado en total</label>
+        <input id="cCobrado" type="number" step="0.01" inputmode="decimal"
+               value="${m.cobrado}"></div>
+      <div><label>Transporte / Pluxee</label>
+        <input id="cReservado" type="number" step="0.01" inputmode="decimal"
+               value="${m.reservado}">
+        <p class="xs mut" style="margin:.25rem 0 0">Ya lo tienes en la Pluxee, así
+          que no te lo llevas a la cuenta.</p></div>
+      <div><label>Mi porcentaje del gasto conjunto</label>
+        <div class="row" style="gap:.4rem">
+          <input id="cPorc" type="number" step="0.01" inputmode="decimal"
+                 value="${(c.porc*100).toFixed(2)}" style="flex:1">
+          <span class="b">%</span></div></div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="t">Presupuestado entre los dos</div>
+      <div class="v">${eur(c.total)}</div>
+      <div class="xs mut">${c.filas.length} partidas</div></div>
+    <div class="kpi"><div class="t">Lo que pago yo</div>
+      <div class="v">${eur(c.mia)}</div>
+      <div class="xs mut">${(c.porc*100).toFixed(2)}% del total</div>
+      ${barra(c.mia, c.total)}</div>
+    <div class="kpi"><div class="t">Lo que pone Paloma</div>
+      <div class="v">${eur(c.suya)}</div>
+      <div class="xs mut">${((1-c.porc)*100).toFixed(2)}% del total</div></div>
+    <div class="kpi"><div class="t">Me llevo a mi cuenta</div>
+      <div class="v ${c.meLlevo<0?'bad':'ok'}">${eur(c.meLlevo)}</div>
+      <div class="xs mut">
+        ${eur(c.cobrado)} cobrado − ${eur(c.mia)} al conjunto =
+        <b>${eur(n2(c.cobrado - c.mia))}</b>
+        ${c.reservado ? `<br>y de ahí ${eur(c.reservado)} ya están en la Pluxee,
+          así que no te los llevas` : ''}</div>
+      ${barra(c.mia + c.reservado, c.cobrado)}</div>
+  </div>
+
+  <div class="card grid">
+    <div class="row"><h2>Partidas presupuestadas</h2>
+      <button class="gh sm" id="cjCopiar" style="margin-left:auto">Traer del mes
+        anterior</button>
+      <button class="sm" id="cjNuevo">Añadir partida</button></div>
+    <div class="tw"><table class="tarjetas"><thead><tr><th>Partida</th>
+      <th style="width:160px">Categoría</th>
+      <th class="right" style="width:118px">Presupuestado</th>
+      <th class="right" style="width:112px">Me toca a mí</th>
+      <th class="right" style="width:112px">Pone Paloma</th>
+      <th style="width:48px"></th></tr></thead><tbody>
+      ${c.detalle.map(f=>`<tr data-id="${f.id}">
+        <td data-label="Partida"><input class="jCon" value="${esc(f.concepto)}"></td>
+        <td data-label="Categoría">
+          <select class="jCat">${optsCats(f.categoria_id)}</select></td>
+        <td class="right" data-label="Presupuestado"><input type="number" step="0.01"
+             inputmode="decimal" class="jImp num right" value="${f.importe}"></td>
+        <td class="right b" data-label="Me toca a mí">${eur(f.mia)}</td>
+        <td class="right mut" data-label="Pone Paloma">
+          ${eur(n2(f.importe - f.mia))}</td>
+        <td class="right"><button class="sm dan jDel" title="Borrar">✕</button></td>
+        </tr>`).join('')}
+      <tr><td class="b">Total</td><td></td>
+        <td class="right b" data-label="Presupuestado">${eur(c.total)}</td>
+        <td class="right b" data-label="Me toca a mí">${eur(c.mia)}</td>
+        <td class="right b" data-label="Pone Paloma">${eur(c.suya)}</td>
+        <td></td></tr>
+    </tbody></table></div>
+    <p class="xs mut">Se guarda al salir de cada campo. «Me toca a mí» es el
+      presupuesto por tu porcentaje del mes.</p>
+  </div>`;
+
+  const salvarMes = obj => guardar('meses', {id:m.id, ...obj});
+  $('#cCobrado').onchange   = e => salvarMes({cobrado:n2(e.target.value)});
+  $('#cReservado').onchange = e => salvarMes({reservado:n2(e.target.value)});
+  $('#cPorc').onchange = e => {
+    const v = Math.max(0, Math.min(100, Number(e.target.value)||0));
+    salvarMes({porcentaje: Math.round(v*10000)/1000000});
+  };
+
+  $('#cjNuevo').onclick = ()=>insertar('conjuntos', {mes_id:m.id,
+    concepto:'Nueva partida', categoria_id:S.categorias[0]?.id, importe:0,
+    orden:(c.filas.length+1)*10});
+  $('#cjCopiar').onclick = async ()=>{
+    const prev = mesPrevio();
+    if(!prev) return toast('No hay mes anterior', true);
+    const ya = new Set(c.filas.map(f=>f.concepto.toLowerCase()));
+    const nuevas = delMes(S.conjuntos, prev.id)
+      .filter(f=>!ya.has(f.concepto.toLowerCase()))
+      .map(f=>({mes_id:m.id, categoria_id:f.categoria_id, concepto:f.concepto,
+                importe:f.importe, orden:f.orden}));
+    if(!nuevas.length) return toast('No hay nada nuevo que traer');
+    const {error} = await S.sb.from('conjuntos').insert(nuevas);
+    if(error) return fail(error);
+    await cargarTodo(); toast(`${nuevas.length} partidas traídas`); render();
+  };
+  const campoJ = (sel, campoBD, transf=v=>v) => $$(sel).forEach(el=>el.onchange=()=>{
+    const id=+el.closest('tr').dataset.id;
+    guardar('conjuntos', {id, [campoBD]: transf(el.value)});
+  });
+  campoJ('.jCon','concepto', v=>String(v).trim()||'Sin concepto');
+  campoJ('.jCat','categoria_id', v=>+v);
+  campoJ('.jImp','importe', v=>n2(v));
+  $$('.jDel').forEach(b=>b.onclick=()=>{
+    const id=+b.closest('tr').dataset.id;
+    const f=S.conjuntos.find(x=>x.id===id);
+    if(confirm(`¿Borrar «${f.concepto}»?`)) borrar('conjuntos', id);
+  });
+}
+
+/* ============================================ 2 · PRESUPUESTO INDIVIDUAL === */
+function vIndividual(m){
+  const iv = calculoIndividual(m);
+  const filas = [...iv.filas].sort((a,b)=>(a.dia??99)-(b.dia??99)
+    || (a.orden??999)-(b.orden??999) || a.id-b.id);
+
+  $('#tIndividual').innerHTML = `
+  <div class="kpis">
+    <div class="kpi"><div class="t">Presupuestado</div>
+      <div class="v">${eur(iv.presupuesto)}</div>
+      <div class="xs mut">${filas.length} partidas</div></div>
+    <div class="kpi"><div class="t">Ya abonado</div>
+      <div class="v">${eur(iv.abonado)}</div>
+      <div class="xs mut">${celdaPct(iv.abonado, iv.presupuesto)} del
+        presupuesto</div>
+      ${barra(iv.abonado, iv.presupuesto)}</div>
+    <div class="kpi"><div class="t">Me queda por pagar</div>
+      <div class="v ${iv.pendiente>0?'warn':'ok'}">${eur(iv.pendiente)}</div>
+      <div class="xs mut">${filas.filter(p=>p.pendiente>0.004).length} partidas
+        sin cerrar</div></div>
+    <div class="kpi"><div class="t">Del que va a ahorro</div>
+      <div class="v">${eur(iv.ahorro)}</div>
+      <div class="xs mut">${celdaPct(iv.ahorro, iv.presupuesto)} de lo
+        presupuestado</div></div>
+  </div>
+
+  <div class="card grid">
+    <div class="row"><h2>Mi presupuesto de ${nombreMes(S.anio,S.mes)}</h2>
+      <button class="gh sm" id="ivCopiar" style="margin-left:auto">Traer fijas del
+        mes anterior</button>
+      <button class="sm" id="ivNueva">Añadir partida</button></div>
+    <div class="tw"><table class="tarjetas"><thead><tr>
+      <th style="width:52px">Día</th><th>Partida</th>
+      <th style="width:150px">Categoría</th>
+      <th class="right" style="width:112px">Presupuestado</th>
+      <th class="right" style="width:104px">Abonado</th>
+      <th class="right" style="width:104px">Pendiente</th>
+      <th class="right" style="width:84px">%</th>
+      <th style="width:56px">Fija</th>
+      <th style="width:132px"></th></tr></thead><tbody>
+      ${filas.map(p=>`<tr data-id="${p.id}">
+        <td data-label="Día"><input type="number" min="1" max="31" class="pDia"
+             value="${p.dia??''}" placeholder="—" style="width:56px"></td>
+        <td data-label="Partida"><input class="pCon" value="${esc(p.concepto)}"></td>
+        <td data-label="Categoría">
+          <select class="pCat">${optsCats(p.categoria_id)}</select></td>
+        <td class="right" data-label="Presupuestado"><input type="number" step="0.01"
+             inputmode="decimal" class="pImp num right" value="${p.importe}"></td>
+        <td class="right" data-label="Abonado"><input type="number" step="0.01"
+             inputmode="decimal" class="pAbo num right" value="${p.abonado}"></td>
+        <td class="right ${p.pendiente>0.004?'warn':''}" data-label="Pendiente">
+          ${eur(p.pendiente)}</td>
+        <td class="right" data-label="Abonado %">
+          ${celdaPct(p.abonado, p.importe)}</td>
+        <td data-label="Fija"><input type="checkbox" class="pFijo"
+             ${p.fijo?'checked':''}></td>
+        <td class="right">
+          ${p.pendiente>0.004
+            ? `<button class="sm gh pTodo">Abonar ${eur(p.pendiente)}</button>`
+            : '<span class="chip ok">al día</span>'}
+          <button class="sm dan pDel" title="Borrar">✕</button></td></tr>`).join('')}
+      <tr><td></td><td class="b">Total</td><td></td>
+        <td class="right b" data-label="Presupuestado">${eur(iv.presupuesto)}</td>
+        <td class="right b" data-label="Abonado">${eur(iv.abonado)}</td>
+        <td class="right b" data-label="Pendiente">${eur(iv.pendiente)}</td>
+        <td class="right b" data-label="Abonado %">
+          ${celdaPct(iv.abonado, iv.presupuesto)}</td>
+        <td colspan="2"></td></tr>
+    </tbody></table></div>
+    <p class="xs mut">«Fija» marca lo que se repite cada mes: es lo que se copia
+      al crear el mes siguiente, con el abonado a cero.</p>
+  </div>
+
+  <div class="card grid">
+    <h2>Por categoría</h2>
+    <div class="tw"><table class="tarjetas"><thead><tr><th>Categoría</th>
+      <th class="right">Presupuestado</th><th class="right">Abonado</th>
+      <th class="right">Pendiente</th><th class="right" style="width:84px">%</th>
+      <th style="width:120px"></th></tr></thead><tbody>
+      ${iv.porCat.map(c=>`<tr>
+        <td><span class="b">${esc(c.nombre)}</span>
+          <span class="xs mut"> ${c.n}</span></td>
+        <td class="right" data-label="Presupuestado">${eur(c.presupuesto)}</td>
+        <td class="right" data-label="Abonado">${eur(c.abonado)}</td>
+        <td class="right ${c.pendiente>0?'warn':''}" data-label="Pendiente">
+          ${eur(c.pendiente)}</td>
+        <td class="right" data-label="Abonado %">
+          ${celdaPct(c.abonado,c.presupuesto)}</td>
+        <td>${barra(c.abonado,c.presupuesto)}</td></tr>`).join('')}
+    </tbody></table></div>
+  </div>`;
+
+  $('#ivNueva').onclick = ()=>insertar('partidas', {mes_id:m.id,
+    concepto:'Nueva partida', categoria_id:S.categorias[0]?.id, importe:0,
+    abonado:0, orden:(filas.length+1)*10});
+  $('#ivCopiar').onclick = async ()=>{
+    const prev = mesPrevio();
+    if(!prev) return toast('No hay mes anterior', true);
+    const ya = new Set(filas.map(p=>p.concepto.toLowerCase()));
+    const nuevas = delMes(S.partidas, prev.id)
+      .filter(p=>p.fijo && !ya.has(p.concepto.toLowerCase()))
+      .map(p=>({mes_id:m.id, categoria_id:p.categoria_id, concepto:p.concepto,
+                importe:p.importe, abonado:0, dia:p.dia, fijo:true, orden:p.orden}));
+    if(!nuevas.length) return toast('No hay nada nuevo que traer');
+    const {error} = await S.sb.from('partidas').insert(nuevas);
+    if(error) return fail(error);
+    await cargarTodo(); toast(`${nuevas.length} partidas traídas`); render();
+  };
+  const campo = (sel, campoBD, transf=v=>v) => $$(sel).forEach(el=>el.onchange=()=>{
+    const id=+el.closest('tr').dataset.id;
+    guardar('partidas', {id, [campoBD]:
+      transf(el.type==='checkbox' ? el.checked : el.value)});
+  });
+  campo('.pCon','concepto', v=>String(v).trim()||'Sin concepto');
+  campo('.pCat','categoria_id', v=>+v);
+  campo('.pImp','importe', v=>n2(v));
+  campo('.pAbo','abonado', v=>n2(v));
+  campo('.pDia','dia', v=>v===''?null:Math.max(1,Math.min(31,+v)));
+  campo('.pFijo','fijo');
+  $$('.pTodo').forEach(b=>b.onclick=()=>{
+    const id=+b.closest('tr').dataset.id;
+    const p=S.partidas.find(x=>x.id===id);
+    guardar('partidas', {id, abonado:n2(p.importe)});
+  });
+  $$('.pDel').forEach(b=>b.onclick=()=>{
+    const id=+b.closest('tr').dataset.id;
+    const p=S.partidas.find(x=>x.id===id);
+    if(confirm(`¿Borrar «${p.concepto}»?`)) borrar('partidas', id);
+  });
+}
+
+/* ============================================================ 3 · ANÁLISIS ===
+   Todo lo interpretativo vive aquí: las otras dos páginas son solo la tabla.
+   ========================================================================= */
+function vAnalisis(){
+  const rs = S.meses.map(resumenMes);
+  if(!rs.length){
+    $('#tAnalisis').innerHTML = `<div class="card"><div class="aviso i">📊<div>
+      Todavía no hay meses que analizar.</div></div></div>`;
+    return;
+  }
+  const conDatos = rs.filter(r=>r.conjunto.total>0);   // meses con gasto conjunto
+  const conCobro = rs.filter(r=>r.cobrado>0);          // meses con lo cobrado puesto
+  const med = (arr,f) => arr.length ? n2(sum(arr,f)/arr.length) : 0;
+  const act = rs.find(r=>r.anio===S.anio && r.mes===S.mes) || rs[rs.length-1];
+
+  const tot = {
+    conjunto:   n2(sum(rs, r=>r.conjunto.total)),
+    mia:        n2(sum(rs, r=>r.conjunto.mia)),
+    individual: n2(sum(rs, r=>r.individual.presupuesto)),
+    abonado:    n2(sum(rs, r=>r.individual.abonado)),
+    ahorro:     n2(sum(rs, r=>r.individual.ahorro)),
+    cobrado:    n2(sum(rs, r=>r.cobrado)),
+    meLlevo:    n2(sum(conCobro, r=>r.conjunto.meLlevo)),
+  };
+  // gasto acumulado por categoría, separando conjunto e individual
+  const cats = new Map();
+  const toca = nom => { if(!cats.has(nom)) cats.set(nom,{nom,conjunto:0,mio:0,
+                          individual:0}); return cats.get(nom); };
+  rs.forEach(r=>{
+    r.conjunto.detalle.forEach(f=>{ const c=toca(catNom(f.categoria_id));
+      c.conjunto=n2(c.conjunto+f.importe); c.mio=n2(c.mio+f.mia); });
+    r.individual.filas.forEach(p=>{ const c=toca(catNom(p.categoria_id));
+      c.individual=n2(c.individual+p.importe); c.mio=n2(c.mio+p.importe); });
+  });
+  const filasCat = [...cats.values()].sort((a,b)=>b.mio-a.mio);
+  const topCat = filasCat[0]?.mio || 1;
+
+  // rachas y avisos interpretativos
+  const notas = [];
+  if(conCobro.length>=2){
+    const u=conCobro[conCobro.length-1], p=conCobro[conCobro.length-2];
+    const d=n2(u.conjunto.meLlevo - p.conjunto.meLlevo);
+    notas.push(`En ${MES3[u.mes-1]} te llevaste <b>${eur(u.conjunto.meLlevo)}</b>,
+      ${d>=0?'<b class="ok">'+eur(d)+' más</b>':'<b class="bad">'+eur(-d)+' menos</b>'}
+      que en ${MES3[p.mes-1]}.`);
+  }
+  if(conDatos.length>=2){
+    const pmin=conDatos.reduce((a,b)=>a.porc<b.porc?a:b);
+    const pmax=conDatos.reduce((a,b)=>a.porc>b.porc?a:b);
+    notas.push(`Tu porcentaje ha ido del <b>${(pmin.porc*100).toFixed(2)}%</b>
+      (${MES3[pmin.mes-1]} ${pmin.anio}) al <b>${(pmax.porc*100).toFixed(2)}%</b>
+      (${MES3[pmax.mes-1]} ${pmax.anio}); de media
+      <b>${(med(conDatos,r=>r.porc)*100).toFixed(2)}%</b>.`);
+  }
+  const caro = rs.reduce((a,b)=>a.individual.presupuesto>b.individual.presupuesto?a:b);
+  notas.push(`Tu mes individual más caro fue <b>${MES3[caro.mes-1]} ${caro.anio}</b>
+    con ${eur(caro.individual.presupuesto)}; la media es
+    ${eur(med(rs,r=>r.individual.presupuesto))}.`);
+  if(filasCat.length)
+    notas.push(`Donde más se te va es <b>${esc(filasCat[0].nom)}</b>:
+      ${eur(filasCat[0].mio)} contando tu parte del conjunto y lo individual.`);
+  const flojos = rs.filter(r=>r.individual.presupuesto>0
+    && r.individual.abonado < r.individual.presupuesto*0.95);
+  if(flojos.length)
+    notas.push(`Te quedan pagos sin cerrar en <b>${flojos.length} mes(es)</b>:
+      ${flojos.slice(-4).map(r=>`${MES3[r.mes-1]} ${String(r.anio).slice(2)}
+      (${eur(r.individual.pendiente)})`).join(', ')}.`);
+
+  $('#tAnalisis').innerHTML = `
+  <div class="kpis">
+    <div class="kpi"><div class="t">Meses registrados</div>
+      <div class="v">${rs.length}</div>
+      <div class="xs mut">de ${MES3[rs[0].mes-1]} ${rs[0].anio} a
+        ${MES3[rs[rs.length-1].mes-1]} ${rs[rs.length-1].anio}</div></div>
+    <div class="kpi"><div class="t">Mi parte del conjunto</div>
+      <div class="v">${eur(tot.mia)}</div>
+      <div class="xs mut">de ${eur(tot.conjunto)} del hogar · media
+        ${eur(med(conDatos,r=>r.conjunto.mia))}/mes</div></div>
+    <div class="kpi"><div class="t">Mi presupuesto individual</div>
+      <div class="v">${eur(tot.individual)}</div>
+      <div class="xs mut">media ${eur(med(rs,r=>r.individual.presupuesto))}/mes ·
+        abonado ${celdaPct(tot.abonado, tot.individual)}</div></div>
+    <div class="kpi"><div class="t">Me llevé a la cuenta</div>
+      <div class="v">${eur(tot.meLlevo)}</div>
+      <div class="xs mut">en ${conCobro.length} mes(es) con datos · media
+        ${eur(med(conCobro,r=>r.conjunto.meLlevo))}/mes</div></div>
+    <div class="kpi"><div class="t">A ahorro e inversión</div>
+      <div class="v">${eur(tot.ahorro)}</div>
+      <div class="xs mut">media ${eur(med(rs,r=>r.individual.ahorro))}/mes</div></div>
+  </div>
+
+  <div class="card grid"><h2>Lo que salta a la vista</h2>
+    <div class="avisos">${notas.map(t=>
+      `<div class="aviso i">💡<div>${t}</div></div>`).join('')}</div></div>
+
+  <div class="two">
+    <div class="card grid"><h2>A dónde va lo que cobro</h2>
+      <div class="chartbox" style="height:250px"><canvas id="chDona"></canvas></div>
+      <p class="xs mut">${nombreMes(act.anio,act.mes)}: de
+        ${eur(act.cobrado)} cobrado.</p></div>
+    <div class="card grid"><h2>Mes a mes contra lo cobrado</h2>
+      <div class="chartbox" style="height:250px"><canvas id="chMeses"></canvas></div>
+      <p class="xs mut">Barras apiladas: mi parte del conjunto y mi presupuesto
+        individual. La línea es lo que cobré.</p></div>
+  </div>
+
+  <div class="two">
+    <div class="card grid"><h2>Evolución de mi porcentaje</h2>
+      <div class="chartbox" style="height:230px"><canvas id="chPorc"></canvas></div>
+    </div>
+    <div class="card grid"><h2>Presupuestado contra abonado</h2>
+      <div class="chartbox" style="height:230px"><canvas id="chAbon"></canvas></div>
+      <p class="xs mut">Mi presupuesto individual por meses: cuánto había puesto
+        y cuánto llegué a abonar.</p></div>
+  </div>
+
+  <div class="card grid">
+    <div class="row"><h2>Todos los meses</h2>
+      <button class="gh sm" id="csv" style="margin-left:auto">Descargar CSV</button></div>
+    <div class="tw"><table class="tarjetas"><thead><tr><th>Mes</th>
+      <th class="right">Cobrado</th><th class="right">Pluxee</th>
+      <th class="right">Conjunto</th><th class="right">%</th>
+      <th class="right">Mi parte</th><th class="right">Me llevo</th>
+      <th class="right">Individual</th><th class="right">Abonado</th>
+      <th class="right">Sobra</th></tr></thead><tbody>
+      ${[...rs].reverse().map(r=>`<tr>
+        <td><a href="#" class="irMes b" data-a="${r.anio}" data-m="${r.mes}"
+          >${MES3[r.mes-1]} ${r.anio}</a></td>
+        <td class="right" data-label="Cobrado">${eur(r.cobrado)}</td>
+        <td class="right mut" data-label="Pluxee">${r.reservado?eur(r.reservado):'—'}</td>
+        <td class="right" data-label="Conjunto">${eur(r.conjunto.total)}</td>
+        <td class="right" data-label="Mi porcentaje">
+          ${r.porc?(r.porc*100).toFixed(2)+'%':'—'}</td>
+        <td class="right b" data-label="Mi parte">${eur(r.conjunto.mia)}</td>
+        <td class="right ${r.conjunto.meLlevo<0?'bad':''}" data-label="Me llevo">
+          ${r.cobrado?eur(r.conjunto.meLlevo):'—'}</td>
+        <td class="right" data-label="Individual">${eur(r.individual.presupuesto)}</td>
+        <td class="right" data-label="Abonado">
+          ${celdaPct(r.individual.abonado, r.individual.presupuesto)}</td>
+        <td class="right ${r.sobra<0?'bad':'ok'}" data-label="Sobra">
+          ${r.cobrado?eur(r.sobra):'—'}</td></tr>`).join('')}
+      <tr><td class="b">Total</td>
+        <td class="right b" data-label="Cobrado">${eur(tot.cobrado)}</td><td></td>
+        <td class="right b" data-label="Conjunto">${eur(tot.conjunto)}</td><td></td>
+        <td class="right b" data-label="Mi parte">${eur(tot.mia)}</td>
+        <td class="right b" data-label="Me llevo">${eur(tot.meLlevo)}</td>
+        <td class="right b" data-label="Individual">${eur(tot.individual)}</td>
+        <td class="right b" data-label="Abonado">
+          ${celdaPct(tot.abonado, tot.individual)}</td><td></td></tr>
+    </tbody></table></div>
+    <p class="xs mut">«Sobra» es lo que te llevas menos tu presupuesto individual.
+      Los meses sin lo cobrado apuntado salen con guion.</p>
+  </div>
+
+  <div class="card grid">
+    <h2>En qué se me va el dinero</h2>
+    <div class="tw"><table class="tarjetas"><thead><tr><th>Categoría</th>
+      <th class="right">Mi parte del conjunto</th>
+      <th class="right">Individual</th><th class="right">Total mío</th>
+      <th class="right">Media/mes</th><th style="width:120px"></th>
+      </tr></thead><tbody>
+      ${filasCat.map(c=>`<tr>
+        <td><span class="b">${esc(c.nom)}</span></td>
+        <td class="right" data-label="Conjunto (mi parte)">
+          ${c.conjunto?eur(n2(c.mio-c.individual)):'—'}</td>
+        <td class="right" data-label="Individual">
+          ${c.individual?eur(c.individual):'—'}</td>
+        <td class="right b" data-label="Total mío">${eur(c.mio)}</td>
+        <td class="right" data-label="Media/mes">${eur(n2(c.mio/rs.length))}</td>
+        <td>${barra(c.mio, topCat)}</td></tr>`).join('')}
+      <tr><td class="b">Total</td>
+        <td class="right b" data-label="Conjunto (mi parte)">${eur(tot.mia)}</td>
+        <td class="right b" data-label="Individual">${eur(tot.individual)}</td>
+        <td class="right b" data-label="Total mío">
+          ${eur(n2(tot.mia+tot.individual))}</td>
+        <td class="right b" data-label="Media/mes">
+          ${eur(n2((tot.mia+tot.individual)/rs.length))}</td><td></td></tr>
+    </tbody></table></div>
+  </div>`;
+
+  $$('.irMes').forEach(a=>a.onclick=e=>{
+    e.preventDefault();
+    S.anio=+a.dataset.a; S.mes=+a.dataset.m; S.tab='conjunto';
+    $('#mAnio').value=S.anio; $('#mMes').value=S.mes;
+    render(); window.scrollTo({top:0,behavior:'smooth'});
+  });
+  $('#csv').onclick = ()=>{
+    const cab = ['Año','Mes','Cobrado','Pluxee','Gasto conjunto','Mi porcentaje',
+                 'Mi parte del conjunto','Pone Paloma','Me llevo','Individual',
+                 'Abonado','Pendiente','Sobra'];
+    const filas = rs.map(r=>[r.anio, r.mes, r.cobrado, r.reservado,
+      r.conjunto.total, (r.porc*100).toFixed(2), r.conjunto.mia, r.conjunto.suya,
+      r.conjunto.meLlevo, r.individual.presupuesto, r.individual.abonado,
+      r.individual.pendiente, r.sobra]);
+    const txt = [cab, ...filas].map(f=>f.join(';')).join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob(['﻿'+txt],
+      {type:'text/csv;charset=utf-8'}));
+    a.download='mis-finanzas.csv'; a.click();
+  };
+
+  const donaDatos = [
+    {nombre:'Mi parte del conjunto', valor:act.conjunto.mia},
+    {nombre:'Mi presupuesto individual', valor:act.individual.presupuesto},
+    {nombre:'Transporte / Pluxee', valor:act.reservado},
+    {nombre:'Sin asignar', valor:Math.max(0, act.sobra)},
+  ].filter(d=>d.valor>0);
+  dona('chDona', donaDatos);
+  mesAMes('chMeses', rs);
+  evolucionPorcentaje('chPorc', rs);
+  presupuestadoAbonado('chAbon', rs);
+}
+
+/* ============================================================= gráficas ===
+   Con maintainAspectRatio:false el lienzo tiene que vivir en una caja de
+   altura fija y estar posicionado en absoluto (lo hace .chartbox), o Chart.js
+   entra en un bucle de redimensionado y la página crece sin parar.
+   ========================================================================= */
+const COLORES = ['#6366f1','#ec4899','#14b8a6','#f59e0b','#8b5cf6','#06b6d4',
+                 '#ef4444','#22c55e','#a855f7','#f97316','#0ea5e9','#84cc16'];
+const tinta = () => getComputedStyle(document.body).getPropertyValue('color')
+                    || '#0d1424';
+const rejilla = 'rgba(128,128,128,.15)';
+function nuevoChart(id, cfg){
+  S.charts[id]?.destroy();
+  const cv=$('#'+id); if(!cv) return;
+  cfg.options = Object.assign({responsive:true, maintainAspectRatio:false,
+    animation:{duration:250}}, cfg.options||{});
+  S.charts[id]=new Chart(cv.getContext('2d'), cfg);
+}
+const ejeEuros = () => ({ticks:{color:tinta(), font:{size:10},
+  callback:v=>v+' €'}, grid:{color:rejilla}});
+const ejeMeses = (extra={}) => Object.assign({ticks:{color:tinta(), font:{size:10}},
+  grid:{display:false}}, extra);
+const leyenda = () => ({labels:{color:tinta(), boxWidth:12, font:{size:11}}});
+const etiquetas = rs => rs.map(r=>`${MES3[r.mes-1]} ${String(r.anio).slice(2)}`);
+
+function dona(id, datos){
+  if(!datos.length) return;
+  nuevoChart(id, {
+    type:'doughnut',
+    data:{labels:datos.map(d=>d.nombre),
+      datasets:[{data:datos.map(d=>d.valor), backgroundColor:COLORES,
+                 borderWidth:0, hoverOffset:6}]},
+    options:{cutout:'58%', plugins:{legend:{position:'right',
+      labels:{color:tinta(), boxWidth:10, boxHeight:10, font:{size:11}}},
+      tooltip:{callbacks:{label:c=>` ${c.label}: ${eur(c.parsed)}`}}}}
+  });
+}
+function mesAMes(id, rs){
+  nuevoChart(id, {
+    type:'bar',
+    data:{labels:etiquetas(rs),
+      datasets:[
+        {label:'Mi parte del conjunto', data:rs.map(r=>r.conjunto.mia),
+         backgroundColor:'rgba(99,102,241,.75)', borderRadius:5, stack:'g'},
+        {label:'Individual', data:rs.map(r=>r.individual.presupuesto),
+         backgroundColor:'rgba(236,72,153,.75)', borderRadius:5, stack:'g'},
+        {label:'Cobrado', data:rs.map(r=>r.cobrado||null), type:'line',
+         borderColor:'#14b8a6', backgroundColor:'#14b8a6', borderWidth:2,
+         pointRadius:3, tension:.3, spanGaps:true}]},
+    options:{plugins:{legend:leyenda(),
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${eur(c.parsed.y)}`}}},
+      scales:{x:ejeMeses({stacked:true}),
+              y:Object.assign({stacked:true}, ejeEuros())}}
+  });
+}
+function evolucionPorcentaje(id, rs){
+  const con = rs.filter(r=>r.porc>0);
+  if(!con.length) return;
+  nuevoChart(id, {
+    type:'line',
+    data:{labels:etiquetas(con),
+      datasets:[{label:'Mi porcentaje', data:con.map(r=>n2(r.porc*100)),
+        borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,.18)',
+        fill:true, tension:.3, pointRadius:3, borderWidth:2}]},
+    options:{plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>` ${c.parsed.y.toFixed(2)} %`}}},
+      scales:{x:ejeMeses(),
+              y:{ticks:{color:tinta(), font:{size:10}, callback:v=>v+' %'},
+                 grid:{color:rejilla}}}}
+  });
+}
+function presupuestadoAbonado(id, rs){
+  nuevoChart(id, {
+    type:'bar',
+    data:{labels:etiquetas(rs),
+      datasets:[
+        {label:'Presupuestado', data:rs.map(r=>r.individual.presupuesto),
+         backgroundColor:'rgba(99,102,241,.45)', borderRadius:5},
+        {label:'Abonado', data:rs.map(r=>r.individual.abonado),
+         backgroundColor:'rgba(20,184,166,.8)', borderRadius:5}]},
+    options:{plugins:{legend:leyenda(),
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${eur(c.parsed.y)}`}}},
+      scales:{x:ejeMeses(), y:ejeEuros()}}
+  });
+}
+</script>
+</body>
+</html>
