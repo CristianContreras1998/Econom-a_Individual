@@ -379,8 +379,8 @@ details>summary{cursor:pointer;font-weight:600;font-size:.84rem;color:var(--mut)
     </div>
   </div>
 
-  <section id="tConjunto" class="grid hide" style="margin-top:1rem"></section>
   <section id="tIndividual" class="grid hide" style="margin-top:1rem"></section>
+  <section id="tConjunto" class="grid hide" style="margin-top:1rem"></section>
   <section id="tAnalisis" class="grid hide" style="margin-top:1rem"></section>
 </div>
 </div>
@@ -449,7 +449,7 @@ const barra = (g,p) => `<div class="bar"><i style="width:${pct(g,p)}%;
 const S = {
   sb:null, user:null,
   categorias:[], meses:[], conjuntos:[], partidas:[],
-  anio:null, mes:null, tab:'conjunto', charts:{}
+  anio:null, mes:null, tab:'individual', charts:{}
 };
 /* =====================================================================
    TU PROYECTO DE SUPABASE.
@@ -650,7 +650,7 @@ const ICO = {
   individual: SVG('<path d="M4 6h16M4 12h16M4 18h11"/>'),
   analisis:   SVG('<path d="M4 20V11M10 20V4M16 20v-6M22 20H2"/>'),
 };
-const TABS=[['conjunto','Conjunto'],['individual','Individual'],
+const TABS=[['individual','Individual'],['conjunto','Conjunto'],
             ['analisis','Análisis']];
 /* El análisis mira todos los meses, así que no necesita que el mes exista */
 const SIN_MES = ['analisis'];
@@ -732,7 +732,7 @@ function render(){
   $('#mvCrear').onclick = ()=>crearMes(true);
   $('#mvVacio').onclick = ()=>crearMes(false);
   $('#mvCrear').disabled = !mesPrevio();
-  const secs={conjunto:'#tConjunto', individual:'#tIndividual',
+  const secs={individual:'#tIndividual', conjunto:'#tConjunto',
               analisis:'#tAnalisis'};
   Object.entries(secs).forEach(([k,sel])=>{
     const on = k===S.tab && (mesRow || SIN_MES.includes(k));
@@ -740,7 +740,7 @@ function render(){
     if(!on) $(sel).innerHTML='';
   });
   if(!mesRow && !SIN_MES.includes(S.tab)) return;
-  ({conjunto:vConjunto, individual:vIndividual, analisis:vAnalisis}[S.tab])(mesRow);
+  ({individual:vIndividual, conjunto:vConjunto, analisis:vAnalisis}[S.tab])(mesRow);
 }
 
 async function crearMes(copiando){
